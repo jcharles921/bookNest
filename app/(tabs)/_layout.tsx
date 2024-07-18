@@ -1,18 +1,26 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import Colors from "@/utils/Colors";
+import { useSelector } from 'react-redux';
+import { RootState } from "@/store";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
+  | "light"
+  | "dark";
+
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[theme].active,
         headerShown: false,
+        tabBarStyle: {
+          backgroundColor: Colors[theme].background,
+          borderTopColor: Colors[theme].border,
+        }
+        
       }}>
       <Tabs.Screen
         name="index"
