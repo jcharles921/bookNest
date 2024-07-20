@@ -1,11 +1,47 @@
 import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { books } from "@/db/schema"; // Only keep books related imports
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { openDatabaseSync } from "expo-sqlite/next";
-import { books, preferences } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 const expoDb = openDatabaseSync("db.db");
 const db = drizzle(expoDb);
+
+const storePreference = async (key: string, value: string) => {
+  try {
+    await AsyncStorage.setItem(key, value);
+  } catch (e) {
+    console.error('Error storing preference:', e);
+  }
+};
+
+const getPreference = async (key: string) => {
+  try {
+    const value = await AsyncStorage.getItem(key);
+    return value;
+  } catch (e) {
+    console.error('Error fetching preference:', e);
+  }
+};
+
+const removePreference = async (key: string) => {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (e) {
+    console.error('Error removing preference:', e);
+  }
+};
+
+const getAllPreferences = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const result = await AsyncStorage.multiGet(keys);
+    return result.map(([key, value]) => ({ key, value }));
+  } catch (e) {
+    console.error('Error fetching all preferences:', e);
+  }
+};
 
 class Api {
   resetAll = createAction("books/resetAll");
@@ -89,13 +125,14 @@ class Api {
       }
     }
   );
+
+  // Preferences AsyncStorage Operations
   addPreference = createAsyncThunk(
     "preferences/addPreference",
     async (preference: Preference, { rejectWithValue }) => {
       try {
-        const response = await db.insert(preferences).values(preference);
-        console.log(response + " Consoling response++++++++");
-        return response;
+        await storePreference(preference.id.toString(), JSON.stringify(preference));
+        return preference;
       } catch (error: any) {
         console.log(error + " Consoling error");
         return rejectWithValue("Error adding preference");
@@ -107,7 +144,7 @@ class Api {
     "preferences/fetchPreferences",
     async (_, { rejectWithValue }) => {
       try {
-        const preferencesList = await db.select().from(preferences).all();
+        const preferencesList = await getAllPreferences();
         return preferencesList;
       } catch (error: any) {
         return rejectWithValue("Error fetching preferences");
@@ -122,29 +159,31 @@ class Api {
       { rejectWithValue }
     ) => {
       try {
-        const response = await db
-          .update(preferences)
-          .set(preference)
-          .where(eq(preferences.id, id))
-          .run();
-        return response;
+        const existingPreference = await getPreference(id.toString());
+        if (existingPreference) {
+          const updatedPreference = { ...JSON.parse(existingPreference), ...preference };
+          await storePreference(id.toString(), JSON.stringify(updatedPreference));
+          return updatedPreference;
+        } else {
+          return rejectWithValue("Preference not found");
+        }
       } catch (error: any) {
         return rejectWithValue("Error updating preference");
       }
     }
   );
 
-  // deletePreference = createAsyncThunk(
-  //   "preferences/deletePreference",
-  //   async (id: number, { rejectWithValue }) => {
-  //     try {
-  //       await db.delete(preferences).where(eq(preferences.id, id)).returning();
-  //       return id;
-  //     } catch (error: any) {
-  //       return rejectWithValue("Error deleting preference");
-  //     }
-  //   }
-  // );
+  deletePreference = createAsyncThunk(
+    "preferences/deletePreference",
+    async (id: number, { rejectWithValue }) => {
+      try {
+        await removePreference(id.toString());
+        return id;
+      } catch (error: any) {
+        return rejectWithValue("Error deleting preference");
+      }
+    }
+  );
 }
 
 const api = new Api();
