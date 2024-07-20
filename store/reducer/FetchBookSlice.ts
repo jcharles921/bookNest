@@ -7,7 +7,7 @@ const initialState: FetchBooksState = {
   error: false,
   success: false,
   message: '',
-  data: [],
+  data: {} as any,
 };
 
 const fetchBooksSlice = createSlice({
@@ -22,6 +22,7 @@ const fetchBooksSlice = createSlice({
       state.loading = false;
       state.success = true;
       state.message = 'Books fetched successfully';
+      console.log(action.payload);
       state.data = action.payload;
     });
     builder.addCase(api.fetchBooks.rejected, (state, action: PayloadAction<any>) => {

@@ -4,7 +4,7 @@ import { RootState } from "@/store";
 import { setThemeMode } from "@/store/reducer/ThemeMode";
 import { View, StyleSheet, Pressable } from "react-native";
 import Colors from "@/utils/Colors";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons  } from "@expo/vector-icons";
 
 interface Props {
   children: any;
