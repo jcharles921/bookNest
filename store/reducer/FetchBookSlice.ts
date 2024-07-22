@@ -7,7 +7,7 @@ const initialState: FetchBooksState = {
   error: false,
   success: false,
   message: '',
-  data: {} as any,
+  data: [] as any,
 };
 
 const fetchBooksSlice = createSlice({

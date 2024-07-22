@@ -9,6 +9,7 @@ export const books = sqliteTable('books', {
   author: text('author').notNull(),
   image: text('image').notNull(),
   read: integer('read',{mode:'boolean'}).notNull().default(false),
+  
   createdAt: integer("createAt", { mode: "timestamp" }).notNull(),
   rating: integer('rating').notNull(),
 });

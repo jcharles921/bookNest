@@ -1,15 +1,14 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
+import { Tabs } from "expo-router";
+import React from "react";
+import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import Colors from "@/utils/Colors";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 
 export default function TabLayout() {
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
-  | "light"
-  | "dark";
-
+    | "light"
+    | "dark";
 
   return (
     <Tabs
@@ -19,24 +18,42 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: Colors[theme].background,
           borderTopColor: Colors[theme].border,
-        }
-        
-      }}>
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon
+              name={focused ? "home" : "home-outline"}
+              color={color}
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="addBook"
         options={{
-          title: 'Search',
+          title: "Add Book",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <TabBarIcon
+              name={focused ? "add-circle" : "add-circle-outline"}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? "settings" : "settings-outline"}
+              color={color}
+            />
           ),
         }}
       />

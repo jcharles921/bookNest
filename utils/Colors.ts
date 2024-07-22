@@ -9,6 +9,7 @@ export interface ColorsType {
     secondaryText: string;
     authBackground: string;
     active: string;
+    buttonText:string;
   };
   dark: {
     primary: string;
@@ -20,6 +21,7 @@ export interface ColorsType {
     secondaryText: string;
     authBackground: string;
     active: string;
+    buttonText:string;
   };
 }
 
@@ -34,6 +36,7 @@ const Colors: ColorsType = {
     secondaryText: "#757575",
     active: "#000000",
     authBackground: "#E4F1F8",
+    buttonText:"#000000"
   },
   dark: {
     primary: "#000000",
@@ -45,6 +48,7 @@ const Colors: ColorsType = {
     secondaryText: "#B0B0B0",
     authBackground: "#1E1E1E",
     active: "#ADD8E6",
+    buttonText:"#ffffff"
   },
 };
 
