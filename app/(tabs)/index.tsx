@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, FlatList, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { Searchbar, Title, Paragraph, Button } from "react-native-paper";
@@ -59,6 +59,11 @@ const HomeScreen = () => {
     searchbar: {
       backgroundColor: Colors[theme].background,
       color: Colors[theme].text,
+      borderWidth: 1,
+      borderColor: Colors[theme].border,
+     
+      width: "90%",
+      marginBottom: 30,
     },
     card: {
       backgroundColor: Colors[theme].background,
@@ -90,27 +95,27 @@ const HomeScreen = () => {
     buttonText: {
       color: Colors[theme].buttonText,
     },
+    trends: {
+      color: Colors[theme].text,
+      fontSize: 20,
+      marginTop: 20,
+      marginBottom: 40,
+    },
   });
 
   const onChangeSearch = (query: string) => setSearchQuery(query);
-
-  const handleRatingUpdate = (id: number, rating: number) => {
-    dispatch(api.updateBook({ id, book: { rating } }));
-  };
-
-  const handleReadToggle = (id: number, read: boolean) => {
-    dispatch(api.updateBook({ id, book: { read } }));
-  };
 
   const filteredBooks = books.filter(
     (book) =>
       book.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log(books);
+  const sortBooksByRating = (books: []) => {
+    return [...books].sort((a: Book, b: Book) => b.rating - a.rating);
+  };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Header>
         <View>
           <ThemedText style={styles.welcomeText}>Hi Fela!</ThemedText>
@@ -124,17 +129,21 @@ const HomeScreen = () => {
         onChangeText={onChangeSearch}
         value={searchQuery}
         style={styles.searchbar}
+        theme={{ colors: { onSurfaceVariant: Colors[theme].placeholder} }}
       />
       {loading && <Text>Loading...</Text>}
       {error && <Text>Error: {error}</Text>}
-      {(loading || loading2) ? (
+      {loading ? (
         <ActivityIndicator animating={true} color={"black"} />
       ) : (
         <View style={styles.row1}>
           <Card books={filteredBooks} />
         </View>
       )}
-    </View>
+      {loading2 && <ThemedText>Loading...</ThemedText>}
+      <ThemedText style={styles.trends}>Top rates</ThemedText>
+      <Card books={sortBooksByRating(books as [])} />
+    </ScrollView>
   );
 };
 

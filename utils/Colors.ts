@@ -12,6 +12,7 @@ export interface ColorsType {
     authBackground: string;
     active: string;
     buttonText:string;
+    placeholder: string;
   };
   dark: {
     primary: string;
@@ -26,6 +27,7 @@ export interface ColorsType {
     authBackground: string;
     active: string;
     buttonText:string;
+    placeholder: string;
   };
 }
 
@@ -39,10 +41,12 @@ const Colors: ColorsType = {
     background: "#F5F5F5",
     background2: "#1E1E1E",
     border: "#000000",
-    secondaryText: "#757575",
+    secondaryText: "#828282",
     active: "#000000",
     authBackground: "#E4F1F8",
-    buttonText:"#000000"
+    buttonText:"#000000",
+    placeholder: "#828282",
+
   },
   dark: {
     primary: "#000000",
@@ -56,7 +60,8 @@ const Colors: ColorsType = {
     secondaryText: "#B0B0B0",
     authBackground: "#1E1E1E",
     active: "#ADD8E6",
-    buttonText:"#ffffff"
+    buttonText:"#ffffff",
+    placeholder: "#B0B0B0",
   },
 };
 

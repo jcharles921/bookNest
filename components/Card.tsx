@@ -1,4 +1,4 @@
-import React,{useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -14,7 +14,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { ActivityIndicator } from "react-native-paper";
 import api from "@/store/apis";
- 
 
 interface Book {
   id?: number;
@@ -36,9 +35,11 @@ const Card: React.FC<Props> = ({ books }) => {
     | "light"
     | "dark";
 
-  const { success,error } = useSelector((state: RootState) => state.updateBook);
+  const { success, error } = useSelector(
+    (state: RootState) => state.updateBook
+  );
   const isDark = theme === "dark";
-const [loading, setLoading] = useState(false);
+  const { loading } = useSelector((state: RootState) => state.FetchBookSlice);
 
   const styles = StyleSheet.create({
     card: {
@@ -64,8 +65,6 @@ const [loading, setLoading] = useState(false);
     },
     cardWrapper: {
       overflow: "scroll",
-      borderWidth: 1,
-      borderColor: "blue",
       height: 273,
     },
     rating: {
@@ -83,47 +82,92 @@ const [loading, setLoading] = useState(false);
     ratingText: {
       color: Colors[theme].text2,
     },
+    readStatus: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    title: {
+      color: Colors[theme].text,
+      fontSize: 12,
+      marginTop: 5,
+    },
+    subtitle: {
+      color: Colors[theme].secondaryText,
+      marginTop: 5,
+      marginBottom: 5,
+      fontSize: 10,
+    },
+    finish: {
+      color: Colors[theme].text,
+      fontWeight: "bold",
+      fontSize: 12,
+    },
   });
 
   const handleReadToggle = async (book: Book) => {
-    // Create a partial book object with the updated read status
     const updatedBook: Partial<Book> = { read: !book.read };
-    
-
     if (book.id !== undefined) {
-  
       dispatch(api.updateBook({ id: book.id, book: updatedBook }));
-     setLoading(true);
     }
   };
-  useEffect(() => {
-    setLoading(false);
-  }, [success, error]);
-  
+
+  const truncateText = (text: string, maxWords: number) => {
+    const words = text.split(" ");
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(" ") + "...";
+    }
+    return text;
+  };
 
   return (
     <ScrollView horizontal={true} style={styles.cardWrapper}>
-    {loading && (<ThemedText>Loading...</ThemedText>)}
-      {!loading && books.map((book) => (
-        <View key={book.id} style={styles.card}>
-          <View style={styles.imageBox}>
-            <View style={styles.rating}>
-              <FontAwesome name="star" size={12} color={"#FFD335"} />
-              <Text style={styles.ratingText}>{book.rating}</Text>
+      {!loading &&
+        books.map((book) => (
+          <View key={book.id} style={styles.card}>
+            <View style={styles.imageBox}>
+              <View style={styles.rating}>
+                <FontAwesome name="star" size={12} color={"#FFD335"} />
+                <Text style={styles.ratingText}>{book.rating}</Text>
+              </View>
+              <Image source={{ uri: book.image }} style={styles.image} />
             </View>
-            <Image source={{ uri: book.image }} style={styles.image} />
+            <ThemedText
+              style={styles.title}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {truncateText(book.name, 3)}
+            </ThemedText>
+            <ThemedText
+              style={styles.subtitle}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {truncateText(book.author, 2)}
+            </ThemedText>
+            <Pressable
+              style={styles.readStatus}
+              onPress={() => handleReadToggle(book)}
+            >
+              <Ionicons
+                name={
+                  book.read
+                    ? "checkmark-done-circle"
+                    : "checkmark-done-circle-outline"
+                }
+                size={24}
+                color={isDark ? "white" : "black"}
+              />
+              {book.read && (
+                <ThemedText style={styles.finish}>Completed</ThemedText>
+              )}
+              {!book.read && (
+                <ThemedText style={styles.subtitle}>On going</ThemedText>
+              )}
+            </Pressable>
           </View>
-          <ThemedText>{book.name}</ThemedText>
-          <ThemedText>{book.author}</ThemedText>
-          <Pressable onPress={() => handleReadToggle(book)}>
-            <Ionicons
-              name={book.read ? "checkmark-done-circle" : "checkmark-done-circle-outline"}
-              size={24}
-              color={isDark ? "white" : "black"}
-            />
-          </Pressable>
-        </View>
-      ))}
+        ))}
     </ScrollView>
   );
 };

@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, TextInput, Button, View, Image, Alert } from "react-native";
-import { useDispatch } from "react-redux";
+import {
+  StyleSheet,
+  TextInput,
+  Button,
+  View,
+  Image,
+  Alert,
+} from "react-native";
+import { useDispatch ,useSelector } from "react-redux";
 import * as ImagePicker from "expo-image-picker";
 import { ThemedText } from "@/components/ThemedText";
 import api from "@/store/apis"; // You need to implement this action in your Redux store
@@ -17,9 +24,17 @@ export default function AddBook() {
   useEffect(() => {
     dispatch(api.fetchBooks());
   }, [dispatch]);
-
+  const {success, error} = useSelector((state: RootState) => state.CreateBookSlice);
+  useEffect(() => {
+    dispatch(api.resetAll());
+    dispatch(api.fetchBooks());
+  }, [dispatch,success]);
+  useEffect(() => {
+    dispatch(api.resetOnError());
+  }, [error]);
   const handleSelectImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       Alert.alert("You've refused to allow this app to access your photos!");
       return;
@@ -36,9 +51,9 @@ export default function AddBook() {
       Alert.alert("Please select an image first.");
       return;
     }
-    const clearDateBase =()=>{
+    const clearDateBase = () => {
       dispatch(api.clearDatabase());
-    }
+    };
 
     const newBook = {
       name,
@@ -50,6 +65,7 @@ export default function AddBook() {
     };
     dispatch(api.addBook(newBook));
   };
+
 
   return (
     <View style={styles.container}>

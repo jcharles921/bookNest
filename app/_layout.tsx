@@ -13,7 +13,7 @@ import { store } from "@/store";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MD3DarkTheme, PaperProvider } from "react-native-paper";
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite/next";
+import { openDatabaseSync } from "expo-sqlite";
 import { View, Text } from "react-native";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations"; // Adjust the path if necessary
@@ -52,11 +52,14 @@ export default function RootLayout() {
   const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
-    if (loaded && success) {
-     
-      SplashScreen.hideAsync();
-      // seedBooks();
+    async function initialize() {
+      if (loaded && success) {
+        await seedBooks();
+        SplashScreen.hideAsync();
+      }
     }
+
+    initialize();
   }, [loaded, success]);
 
   if (!loaded || !success) {

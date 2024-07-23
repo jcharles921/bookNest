@@ -7,19 +7,35 @@ import { sql } from "drizzle-orm";
 const expoDb = openDatabaseSync("db.db");
 const db = drizzle(expoDb);
 
+function generateBookTitle() {
+  const adjectives = ["Mysterious", "Enchanted", "Silent", "Hidden", "Forgotten"];
+  const nouns = ["Journey", "Legacy", "Secret", "Destiny", "Chronicles"];
+
+  const adjective = faker.helpers.arrayElement(adjectives);
+  const noun = faker.helpers.arrayElement(nouns);
+  const subtitle = faker.lorem.words(3);
+
+  return `${adjective} ${noun}: ${subtitle}`;
+}
+
 async function seedBooks() {
-  // Clear the books table
+  // Check if the books table is empty
   try {
-    await db.delete(books);
-    console.log("Books table cleared successfully");
+    const bookCountResult = await db.select({ count: sql`COUNT(*)` }).from(books).execute();
+    const bookCount = bookCountResult[0]?.count as number;
+
+    if (bookCount > 0) {
+      console.log("Books table already has data. No seeding required.");
+      return;
+    }
   } catch (error) {
-    console.error("Error clearing books table:", error);
+    console.error("Error checking books table:", error);
     return;
   }
 
   // Generate new book entries
   const bookEntries = Array.from({ length: 10 }, () => ({
-    name: faker.lorem.words(3),
+    name: generateBookTitle(),
     author: faker.person.fullName(),
     image: faker.image.url({ width: 116, height: 154 }),
     read: faker.datatype.boolean(),
