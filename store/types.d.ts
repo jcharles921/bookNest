@@ -4,7 +4,7 @@ interface Book {
   author: string;
   image: string;
   read: boolean;
-  createdAt: Date;
+  createdAt: string;
   rating: number;
 }
 interface CreateBookState {

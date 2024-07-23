@@ -36,13 +36,16 @@ export default function AddBook() {
       Alert.alert("Please select an image first.");
       return;
     }
+    const clearDateBase =()=>{
+      dispatch(api.clearDatabase());
+    }
 
     const newBook = {
       name,
       author,
       image,
       read: false, // default value
-      createdAt: new Date(), // current timestamp
+      createdAt: new Date().toISOString(), // current timestamp
       rating: parseInt(rating),
     };
     dispatch(api.addBook(newBook));

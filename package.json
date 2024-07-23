@@ -3,20 +3,22 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start -c",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
-    "migrate": "npx drizzle-kit generate"
+    "migrate": "npx drizzle-kit generate",
+    "seed": "tsx ./db/seeders.ts"
   },
   "jest": {
     "preset": "jest-expo"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
+    "@faker-js/faker": "^8.4.1",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.6",
@@ -43,7 +45,9 @@
     "react-native-screens": "3.31.1",
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-web": "~0.19.10",
-    "react-redux": "^9.1.2"
+    "react-redux": "^9.1.2",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.16.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -25,6 +25,9 @@ const HomeScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchQuery, setSearchQuery] = useState("");
 
+
+
+  
   const styles = StyleSheet.create({
     welcomeText: {
       fontSize: 28,
