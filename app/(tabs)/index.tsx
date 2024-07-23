@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, FlatList, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { Searchbar, Card, Title, Paragraph, Button } from "react-native-paper";
-import { Pressable } from "react-native";
+import { Searchbar, Title, Paragraph, Button } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
 import api from "@/store/apis";
 import Colors from "@/utils/Colors";
 import Header from "@/components/Header";
 import { ThemedText } from "@/components/ThemedText";
+import Card from "@/components/Card";
 
 const HomeScreen = () => {
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
@@ -19,15 +20,15 @@ const HomeScreen = () => {
     error,
   } = useSelector((state: RootState) => state.FetchBookSlice);
   const { success } = useSelector((state: RootState) => state.CreateBookSlice);
-  const { success: updated } = useSelector(
-    (state: RootState) => state.updatePreference
+  const { success: updated, loading: loading2 } = useSelector(
+    (state: RootState) => state.updateBook
   );
   const dispatch = useDispatch<AppDispatch>();
   const [searchQuery, setSearchQuery] = useState("");
-
-
-
-  
+  useEffect(() => {
+    dispatch(api.resetAll());
+    dispatch(api.fetchBooks());
+  }, [dispatch, success, updated]);
   const styles = StyleSheet.create({
     welcomeText: {
       fontSize: 28,
@@ -40,7 +41,7 @@ const HomeScreen = () => {
     container: {
       backgroundColor: Colors[theme].background,
       flex: 1,
-      padding: 20,
+      paddingLeft: 20,
       fontFamily: "Eina",
     },
     button: {
@@ -53,11 +54,7 @@ const HomeScreen = () => {
       marginBottom: 10,
     },
     row1: {
-      display: "flex",
-      flexDirection: "row",
-      overflow: "scroll",
-      height: 200,
-      gap: 24,
+      height: 273,
     },
     searchbar: {
       backgroundColor: Colors[theme].background,
@@ -95,10 +92,6 @@ const HomeScreen = () => {
     },
   });
 
-  useEffect(() => {
-    dispatch(api.fetchBooks());
-  }, [dispatch, success, updated]);
-
   const onChangeSearch = (query: string) => setSearchQuery(query);
 
   const handleRatingUpdate = (id: number, rating: number) => {
@@ -114,6 +107,7 @@ const HomeScreen = () => {
       book.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  console.log(books);
 
   return (
     <View style={styles.container}>
@@ -133,38 +127,13 @@ const HomeScreen = () => {
       />
       {loading && <Text>Loading...</Text>}
       {error && <Text>Error: {error}</Text>}
-      
-      <FlatList
-        data={filteredBooks}
-        extraData={filteredBooks} // Ensure FlatList re-renders when data changes
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Card style={styles.card}>
-            <Card.Cover source={{ uri: item.image }} style={styles.cardCover} />
-            <Card.Content style={styles.cardContent}>
-              <Title style={styles.text}>{item.name}</Title>
-              <Paragraph style={styles.text}>Author: {item.author}</Paragraph>
-              <Paragraph style={styles.text}>Rating: {item.rating}</Paragraph>
-              <Paragraph style={styles.text}>
-                Read: {item.read ? "Yes" : "No"}
-              </Paragraph>
-            </Card.Content>
-            <Card.Actions style={styles.cardActions}>
-              <Button
-                mode="contained"
-                onPress={() => handleRatingUpdate(item.id, item.rating + 1)}
-              >
-                Increase Rating
-              </Button>
-              <Pressable onPress={() => handleReadToggle(item.id, !item.read)}>
-                <ThemedText>
-                  {item.read ? "Mark as Unread" : "Mark as Read"}
-                </ThemedText>
-              </Pressable>
-            </Card.Actions>
-          </Card>
-        )}
-      />
+      {(loading || loading2) ? (
+        <ActivityIndicator animating={true} color={"black"} />
+      ) : (
+        <View style={styles.row1}>
+          <Card books={filteredBooks} />
+        </View>
+      )}
     </View>
   );
 };

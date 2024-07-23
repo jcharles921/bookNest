@@ -17,6 +17,7 @@ import { openDatabaseSync } from "expo-sqlite/next";
 import { View, Text } from "react-native";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations"; // Adjust the path if necessary
+import { seedBooks } from "@/db/seeders";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,7 +53,9 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (loaded && success) {
+     
       SplashScreen.hideAsync();
+      // seedBooks();
     }
   }, [loaded, success]);
 

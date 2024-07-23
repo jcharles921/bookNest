@@ -107,6 +107,7 @@ class Api {
           .set(book)
           .where(eq(books.id, id))
           .run();
+          console.log(JSON.stringify(response, null, 2) + " Consoling response for updateBook =======");
         return response;
       } catch (error: any) {
         return rejectWithValue("Error updating book");
