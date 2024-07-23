@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Button, Text, FlatList, Image } from "react-native";
-import Colors from "@/utils/Colors";
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { ThemedText } from "@/components/ThemedText";
-import Header from "@/components/Header";
+import { Searchbar, Title, Paragraph, Button } from "react-native-paper";
+import { ActivityIndicator } from "react-native-paper";
 import api from "@/store/apis";
+import Colors from "@/utils/Colors";
+import Header from "@/components/Header";
+import { ThemedText } from "@/components/ThemedText";
 import Card from "@/components/Card";
-import * as ImagePicker from "expo-image-picker";
 
-export default function HomeScreen() {
+const HomeScreen = () => {
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
@@ -18,25 +19,34 @@ export default function HomeScreen() {
     loading,
     error,
   } = useSelector((state: RootState) => state.FetchBookSlice);
-  const dispatch = useDispatch<AppDispatch>();
   const { success } = useSelector((state: RootState) => state.CreateBookSlice);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
+  const { success: updated, loading: loading2 } = useSelector(
+    (state: RootState) => state.updateBook
+  );
+  const dispatch = useDispatch<AppDispatch>();
+  const [searchQuery, setSearchQuery] = useState("");
+  useEffect(() => {
+    dispatch(api.resetAll());
+    dispatch(api.fetchBooks());
+  }, [dispatch, success, updated]);
   const styles = StyleSheet.create({
     welcomeText: {
       fontSize: 28,
+      color: Colors[theme].text,
     },
     welcomeText2: {
       fontSize: 16,
+      color: Colors[theme].secondaryText,
     },
     container: {
       backgroundColor: Colors[theme].background,
-      height: "100%",
+      flex: 1,
       paddingLeft: 20,
       fontFamily: "Eina",
     },
     button: {
       marginTop: 20,
+      backgroundColor: Colors[theme].button,
     },
     imagePreview: {
       width: 100,
@@ -44,52 +54,68 @@ export default function HomeScreen() {
       marginBottom: 10,
     },
     row1: {
-      display: "flex",
-      flexDirection: "row",
-      overflow: "scroll",
-      height: 200,
-      gap: 24,
+      height: 273,
+    },
+    searchbar: {
+      backgroundColor: Colors[theme].background,
+      color: Colors[theme].text,
+      borderWidth: 1,
+      borderColor: Colors[theme].border,
+     
+      width: "90%",
+      marginBottom: 30,
+    },
+    card: {
+      backgroundColor: Colors[theme].background,
+      marginBottom: 10,
+      borderRadius: 10,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    cardCover: {
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+    },
+    cardContent: {
+      padding: 10,
+    },
+    cardActions: {
+      justifyContent: "space-between",
+      padding: 10,
+    },
+    text: {
+      color: Colors[theme].text,
+    },
+    buttonText: {
+      color: Colors[theme].buttonText,
+    },
+    trends: {
+      color: Colors[theme].text,
+      fontSize: 20,
+      marginTop: 20,
+      marginBottom: 40,
     },
   });
 
-  const handleSelectImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      alert("You've refused to allow this app to access your photos!");
-      return;
-    }
+  const onChangeSearch = (query: string) => setSearchQuery(query);
 
-    const pickerResult = await ImagePicker.launchImageLibraryAsync();
-    if (!pickerResult.canceled) {
-      setSelectedImage(pickerResult.assets[0].uri);
-    }
+  const filteredBooks = books.filter(
+    (book) =>
+      book.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.author.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const sortBooksByRating = (books: []) => {
+    return [...books].sort((a: Book, b: Book) => b.rating - a.rating);
   };
-
-  const handleAddBook = () => {
-    if (!selectedImage) {
-      alert("Please select an image first.");
-      return;
-    }
-
-    dispatch(
-      api.addBook({
-        name: "Sample Book",
-        author: "Sample Author",
-        image: selectedImage,
-        read: false,
-        createdAt: new Date(),
-        rating: 5,
-      })
-    );
-  };
-
-  useEffect(() => {
-    dispatch(api.fetchBooks());
-  }, [dispatch, success]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Header>
         <View>
           <ThemedText style={styles.welcomeText}>Hi Fela!</ThemedText>
@@ -98,20 +124,27 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
       </Header>
-      {/* <Button
-        title="Clear Database"
-        onPress={() => dispatch(api.clearDatabase())}
+      <Searchbar
+        placeholder="Search"
+        onChangeText={onChangeSearch}
+        value={searchQuery}
+        style={styles.searchbar}
+        theme={{ colors: { onSurfaceVariant: Colors[theme].placeholder} }}
       />
-      <Button title="Select Image" onPress={handleSelectImage} />
-      {selectedImage && (
-        <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
-      )}
-      <Button title="Add Book" onPress={handleAddBook} />
       {loading && <Text>Loading...</Text>}
-      {error && <Text>Error: {error}</Text>} */}
-      <View style={styles.row1}>
-        <Card books={[]} />
-      </View>
-    </View>
+      {error && <Text>Error: {error}</Text>}
+      {loading ? (
+        <ActivityIndicator animating={true} color={"black"} />
+      ) : (
+        <View style={styles.row1}>
+          <Card books={filteredBooks} />
+        </View>
+      )}
+      {loading2 && <ThemedText>Loading...</ThemedText>}
+      <ThemedText style={styles.trends}>Top rates</ThemedText>
+      <Card books={sortBooksByRating(books as [])} />
+    </ScrollView>
   );
-}
+};
+
+export default HomeScreen;

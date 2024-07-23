@@ -19,13 +19,21 @@ const updateBookSlice = createSlice({
     builder.addCase(api.updateBook.fulfilled, (state, action: PayloadAction<any>) => {
       state.loading = false;
       state.success = true;
+      console.log("Book updated successfully");
       state.message = 'Book updated successfully';
+
     });
     builder.addCase(api.updateBook.rejected, (state, action: PayloadAction<any>) => {
       state.loading = false;
       state.error = action.payload || 'Error updating book';
       state.message = action.payload || 'Error updating book';
       state.success = false;
+    });
+    builder.addCase(api.resetAll, (state) => {
+      state.error = false;
+      state.message = '';
+      state.success = false;
+
     });
   },
 });

@@ -5,11 +5,11 @@ import { ThemedText } from "@/components/ThemedText";
 
 import { View } from "react-native";
 
-export default function SearchTab() {
+export default function Settings() {
   return (
     <View>
       <View style={styles.titleContainer}>
-        <ThemedText >Search</ThemedText>
+        <ThemedText >Settings</ThemedText>
       </View>
     </View>
   );

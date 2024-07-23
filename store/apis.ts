@@ -53,7 +53,7 @@ class Api {
       try {
         const bookWithValidDate = {
           ...book,
-          createdAt: new Date(book.createdAt),
+          createdAt: new Date(book.createdAt).toISOString(),
         };
         const response = await db.insert(books).values(bookWithValidDate);
         console.log(response + " Consoling response++++++++");
@@ -71,11 +71,11 @@ class Api {
       try {
         const booksList = await db.select().from(books).all();
         const serializedBooksList = booksList.map((book) => ({
-          ...book,
-          createdAt: book.createdAt.toISOString(),
+          ...book
         }));
         return serializedBooksList;
       } catch (error: any) {
+        console.log(error + " Consoling error");
         return rejectWithValue("Error fetching books");
       }
     }
@@ -107,6 +107,7 @@ class Api {
           .set(book)
           .where(eq(books.id, id))
           .run();
+          console.log(JSON.stringify(response, null, 2) + " Consoling response for updateBook =======");
         return response;
       } catch (error: any) {
         return rejectWithValue("Error updating book");

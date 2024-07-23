@@ -23,7 +23,7 @@ const Header: React.FC<Props> = ({ children }) => {
   const styles = StyleSheet.create({
     container: {
       width: "100%",
-      marginTop: 40, 
+      marginTop: 25, 
       height: 120,
       display: "flex",
       flexDirection: "row",
