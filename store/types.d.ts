@@ -7,7 +7,6 @@ interface Book {
   createdAt: string;
   rating: number;
 }
-
 interface CreateBookState {
   loading: boolean;
   error: boolean | string;
