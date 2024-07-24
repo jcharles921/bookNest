@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, ScrollView, Text } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { StyleSheet, View, ScrollView, Text, RefreshControl } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
-import { Searchbar, Title, Paragraph, Button } from "react-native-paper";
-import { ActivityIndicator } from "react-native-paper";
+import { Searchbar, ActivityIndicator } from "react-native-paper";
 import api from "@/store/apis";
 import Colors from "@/utils/Colors";
 import Header from "@/components/Header";
@@ -25,10 +24,18 @@ const HomeScreen = () => {
   );
   const dispatch = useDispatch<AppDispatch>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     dispatch(api.resetAll());
     dispatch(api.fetchBooks());
   }, [dispatch, success, updated]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(api.fetchBooks()).then(() => setRefreshing(false));
+  }, [dispatch]);
+
   const styles = StyleSheet.create({
     welcomeText: {
       fontSize: 28,
@@ -41,6 +48,7 @@ const HomeScreen = () => {
     container: {
       backgroundColor: Colors[theme].background,
       flex: 1,
+      marginTop: 20,
       paddingLeft: 20,
       fontFamily: "Eina",
     },
@@ -61,7 +69,6 @@ const HomeScreen = () => {
       color: Colors[theme].text,
       borderWidth: 1,
       borderColor: Colors[theme].border,
-     
       width: "90%",
       marginBottom: 30,
     },
@@ -110,12 +117,18 @@ const HomeScreen = () => {
       book.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
   const sortBooksByRating = (books: []) => {
     return [...books].sort((a: Book, b: Book) => b.rating - a.rating);
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <Header>
         <View>
           <ThemedText style={styles.welcomeText}>Hi Fela!</ThemedText>
@@ -129,7 +142,7 @@ const HomeScreen = () => {
         onChangeText={onChangeSearch}
         value={searchQuery}
         style={styles.searchbar}
-        theme={{ colors: { onSurfaceVariant: Colors[theme].placeholder} }}
+        theme={{ colors: { onSurfaceVariant: Colors[theme].placeholder } }}
       />
       {loading && <Text>Loading...</Text>}
       {error && <Text>Error: {error}</Text>}

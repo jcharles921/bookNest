@@ -147,6 +147,7 @@ const Card: React.FC<Props> = ({ books }) => {
               {truncateText(book.author, 2)}
             </ThemedText>
             <Pressable
+            onPressIn={() => handleReadToggle(book)}
               style={styles.readStatus}
               onPress={() => handleReadToggle(book)}
             >
