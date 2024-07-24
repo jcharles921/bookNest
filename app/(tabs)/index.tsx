@@ -70,6 +70,7 @@ const HomeScreen = () => {
       borderWidth: 1,
       borderColor: Colors[theme].border,
       width: "90%",
+      marginTop:20,
       marginBottom: 30,
     },
     card: {
