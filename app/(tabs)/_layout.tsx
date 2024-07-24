@@ -34,12 +34,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="addBook"
+        name="book"
         options={{
-          title: "Add Book",
+          title: "Books",
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? "add-circle" : "add-circle-outline"}
+              name={focused ? "book" : "book-outline"}
               color={color}
             />
           ),
