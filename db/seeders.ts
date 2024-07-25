@@ -8,8 +8,50 @@ const expoDb = openDatabaseSync("db.db");
 const db = drizzle(expoDb);
 
 function generateBookTitle() {
-  const adjectives = ["Mysterious", "Enchanted", "Silent", "Hidden", "Forgotten"];
-  const nouns = ["Journey", "Legacy", "Secret", "Destiny", "Chronicles"];
+  const adjectives = [
+    "Mysterious",
+    "Enchanted",
+    "Silent",
+    "Hidden",
+    "Forgotten",
+    "Ancient",
+    "Sacred",
+    "Lost",
+    "Haunted",
+    "Golden",
+    "Shadowy",
+    "Eternal",
+    "Majestic",
+    "Radiant",
+    "Vivid",
+    "Serene",
+    "Distant",
+    "Enigmatic",
+    "Secret",
+    "Whispering",
+  ];
+  const nouns = [
+    "Journey",
+    "Legacy",
+    "Secret",
+    "Destiny",
+    "Chronicles",
+    "Quest",
+    "Saga",
+    "Tale",
+    "Mystery",
+    "Adventure",
+    "Odyssey",
+    "Epic",
+    "Story",
+    "Legend",
+    "Fable",
+    "Myth",
+    "Voyage",
+    "Expedition",
+    "Discovery",
+    "Pilgrimage",
+  ];
 
   const adjective = faker.helpers.arrayElement(adjectives);
   const noun = faker.helpers.arrayElement(nouns);
@@ -19,7 +61,6 @@ function generateBookTitle() {
 }
 
 async function seedBooks() {
-  // Check if the books table is empty
   try {
     const bookCountResult = await db.select({ count: sql`COUNT(*)` }).from(books).execute();
     const bookCount = bookCountResult[0]?.count as number;
@@ -34,13 +75,13 @@ async function seedBooks() {
   }
 
   // Generate new book entries
-  const bookEntries = Array.from({ length: 10 }, () => ({
+  const bookEntries = Array.from({ length: 20 }, () => ({
     name: generateBookTitle(),
     author: faker.person.fullName(),
     image: faker.image.url({ width: 116, height: 154 }),
     read: faker.datatype.boolean(),
     createdAt: sql`datetime('now')`, // Use SQL function for current timestamp
-    rating: faker.number.int({ min: 1, max: 5 }),
+    rating: faker.number.float({ min: 0, max: 5, multipleOf: 0.1 }),
   }));
 
   // Insert the new book entries
@@ -52,4 +93,17 @@ async function seedBooks() {
   }
 }
 
-export { seedBooks };
+async function resetDatabase() {
+  try {
+    // Delete all entries in the books table
+    await db.delete(books).execute();
+    console.log("All entries in books table deleted successfully.");
+
+    // Seed the books table with new data
+    await seedBooks();
+  } catch (error) {
+    console.error("Error resetting database:", error);
+  }
+}
+
+export { seedBooks, resetDatabase };

@@ -4,6 +4,7 @@ import {
   View,
   Pressable,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { ThemedText } from "@/components/ThemedText";
@@ -32,12 +33,14 @@ export default function AddBook() {
   const { success: updated, loading: loading2 } = useSelector(
     (state: RootState) => state.updateBook
   );
-
-
   useEffect(() => {
     dispatch(api.resetAll());
     dispatch(api.fetchBooks());
   }, [dispatch, success, updated]);
+  const refresh = () => {
+    dispatch(api.resetAll());
+    dispatch(api.fetchBooks());
+  };
   const styles = StyleSheet.create({
     container: {
       paddingLeft: 16,
@@ -87,7 +90,12 @@ export default function AddBook() {
           color={isDark ? "white" : "black"}
         />
       </Pressable>
-      <ScrollView style={styles.flatList}>
+      <ScrollView
+        style={styles.flatList}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refresh} />
+        }
+      >
         <FlatListCard books={books} />
       </ScrollView>
     </View>
