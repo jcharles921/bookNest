@@ -1,5 +1,5 @@
 // schema.ts
-import { integer, text, sqliteTable } from "drizzle-orm/sqlite-core";
+import { integer, text, sqliteTable, real } from "drizzle-orm/sqlite-core";
 
 // Define the Book table
 export const books = sqliteTable("books", {
@@ -8,9 +8,8 @@ export const books = sqliteTable("books", {
   author: text("author").notNull(),
   image: text("image").notNull(),
   read: integer("read", { mode: "boolean" }).notNull().default(false),
-
   createdAt: text("createdAt").notNull(),
-  rating: integer("rating").notNull(),
+  rating: real("rating").notNull(),
 });
 
 export const preferences = sqliteTable("preferences", {

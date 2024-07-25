@@ -73,6 +73,7 @@ class Api {
         const serializedBooksList = booksList.map((book) => ({
           ...book
         }));
+        
         return serializedBooksList;
       } catch (error: any) {
         console.log(error + " Consoling error");
@@ -114,12 +115,29 @@ class Api {
       }
     }
   );
+  getBook = createAsyncThunk(
+    "books/getBook",
+    async (id: number, { rejectWithValue }) => {
+      try {
+        const book = await db.select().from(books).where(eq(books.id, id));
+        if (book) {
+          return book;
+        } else {
+          return rejectWithValue("Book not found");
+        }
+      } catch (error: any) {
+        console.log(error + " Consoling error");
+        return rejectWithValue("Error fetching book");
+      }
+    }
+  );
 
   deleteBook = createAsyncThunk(
     "books/deleteBook",
     async (id: number, { rejectWithValue }) => {
       try {
         await db.delete(books).where(eq(books.id, id)).returning();
+        console.log("Deleted")
         return id;
       } catch (error: any) {
         return rejectWithValue("Error deleting book");

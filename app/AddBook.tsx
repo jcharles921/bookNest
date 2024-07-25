@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { StyleSheet, View, Image, Alert } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ThemedText } from "@/components/ThemedText";
 import api from "@/store/apis"; // You need to implement this action in your Redux store
@@ -10,11 +11,17 @@ import { RootState, AppDispatch } from "@/store";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { Rating } from "react-native-ratings";
+import { useRouter } from "expo-router";
+import { setBookToEdit } from "@/store/reducer/editBookSlice";
 
 const AddBookSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
   author: Yup.string().required("Author is required"),
-  rating: Yup.number().required("Rating is required").min(1).max(5),
+  rating: Yup.number()
+    .required("Rating is required")
+    .min(1, "Rating must be at least 1")
+    .max(5, "Rating cannot be more than 5"),
+  image: Yup.string().required("Image is required"),
 });
 
 export default function AddBook() {
@@ -22,9 +29,14 @@ export default function AddBook() {
   const { success, error } = useSelector(
     (state: RootState) => state.CreateBookSlice
   );
+
+  const bookToEdit = useSelector(
+    (state: RootState) => state.editBook.bookToEdit
+  );
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
+  const router = useRouter();
   const styles = StyleSheet.create({
     container: {
       padding: 16,
@@ -75,6 +87,19 @@ export default function AddBook() {
   useEffect(() => {
     dispatch(api.resetOnError());
   }, [error]);
+  useFocusEffect(
+    React.useCallback(() => {
+      // This effect runs when the screen comes into focus
+
+      // Cleanup function that runs when the screen loses focus or is unmounted
+      return () => {
+        // Reset your data here
+        dispatch(setBookToEdit(null));
+        dispatch(api.resetAll());
+        dispatch(api.fetchBooks());
+      };
+    }, [])
+  );
 
   const handleSelectImage = async (setFieldValue: any) => {
     const permissionResult =
@@ -89,18 +114,27 @@ export default function AddBook() {
       setFieldValue("image", pickerResult.assets[0].uri);
     }
   };
+  const initialValues = bookToEdit
+    ? { ...bookToEdit }
+    : { name: "", author: "", image: "", rating: 0 };
 
   return (
     <Formik
-      initialValues={{ name: "", author: "", image: "", rating: 0 }}
+      initialValues={initialValues}
       validationSchema={AddBookSchema}
       onSubmit={(values, { resetForm }) => {
-        const newBook = {
-          ...values,
-          read: false,
-          createdAt: new Date().toISOString(),
-        };
-        dispatch(api.addBook(newBook));
+        if (bookToEdit && bookToEdit.id !== undefined) {
+          dispatch(api.updateBook({ id: bookToEdit.id, book: values }));
+        } else {
+          const newBook = {
+            ...values,
+            read: false,
+            createdAt: new Date().toISOString(),
+          };
+          dispatch(api.addBook(newBook));
+          dispatch(setBookToEdit(null));
+          router.push("book");
+        }
         resetForm();
       }}
     >
@@ -120,6 +154,7 @@ export default function AddBook() {
           <TextInput
             mode="outlined"
             label="Name"
+            textColor={Colors[theme].text}
             style={styles.input}
             onChangeText={handleChange("name")}
             onBlur={handleBlur("name")}
@@ -133,6 +168,7 @@ export default function AddBook() {
             mode="outlined"
             label="Author"
             style={styles.input}
+            textColor={Colors[theme].text}
             onChangeText={handleChange("author")}
             onBlur={handleBlur("author")}
             value={values.author}
@@ -160,6 +196,9 @@ export default function AddBook() {
           >
             Select Image
           </Button>
+          {touched.image && errors.image ? (
+            <ThemedText style={styles.errorText}>{errors.image}</ThemedText>
+          ) : null}
           {values.image ? (
             <Image source={{ uri: values.image }} style={styles.image} />
           ) : null}
@@ -168,7 +207,7 @@ export default function AddBook() {
             onPress={(e: any) => handleSubmit()}
             style={styles.button}
           >
-            Submit
+            {bookToEdit ? "Update" : "Submit"}
           </Button>
         </View>
       )}

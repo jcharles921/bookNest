@@ -7,8 +7,9 @@ import updateBook from "./reducer/updateBookSlice";
 import addPreference from "./reducer/addPreference";
 import updatePreference from "./reducer/updatePreference";
 import fetchPreference from "./reducer/fetchPreference";
-
-
+import getSingleBookSlice from "./reducer/getSingleBookSlice";
+import editBookSlice from "./reducer/editBookSlice";
+import deleteBookSlice from "./reducer/deleteBookSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,9 @@ export const store = configureStore({
     addPreference: addPreference,
     updatePreference: updatePreference,
     fetchPreference: fetchPreference,
+    getSingleBookSlice: getSingleBookSlice,
+    editBook: editBookSlice,
+    deleteBookSlice: deleteBookSlice,
   },
 });
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -13,15 +13,19 @@ import { ThemedText } from "./ThemedText";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import Colors from "@/utils/Colors";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import api from "@/store/apis";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
+import { setBookToEdit } from "@/store/reducer/editBookSlice";
+import { useRouter } from "expo-router";
+
 interface Props {
   books: Book[];
 }
 
 const FlatListCard: React.FC<Props> = ({ books }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const [refreshing, setRefreshing] = useState(false);
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
@@ -31,7 +35,19 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
 
   const [loading2, setLoading2] = useState(false);
   const isDark = theme === "dark";
-  const { loading } = useSelector((state: RootState) => state.FetchBookSlice);
+  const { loading }: { loading: any } = useSelector(
+    (state: RootState) => state.FetchBookSlice
+  );
+  const router = useRouter();
+
+  const { success, error } = useSelector(
+    (state: RootState) => state.deleteBookSlice
+  );
+  const handleDelete = (bookId?: number) => {
+    if (bookId !== undefined) {
+      dispatch(api.deleteBook(bookId));
+    }
+  };
 
   const styles = StyleSheet.create({
     card: {
@@ -107,9 +123,27 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
       marginLeft: 16,
     },
   });
+  const refresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(api.resetAll());
+    dispatch(api.fetchBooks()).finally(() => setRefreshing(false));
+  }, [dispatch]);
+  const handleEdit = (book: Book) => {
+    dispatch(setBookToEdit(book));
+    router.navigate("AddBook");
+  };
+  useEffect(() => {
+    if (success) {
+      refresh();
+    }
+  }, [success, refresh]);
 
   return (
-    <ScrollView refreshControl={<RefreshControl refreshing={loading2} />}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={loading2} onRefresh={refresh} />
+      }
+    >
       {!loading &&
         books
           .slice()
@@ -122,7 +156,9 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
               <View style={styles.textBox}>
                 <View style={styles.rating}>
                   <FontAwesome name="star" size={14} color="#FFD335" />
-                  <ThemedText style={styles.ratingText}>{book.rating}</ThemedText>
+                  <ThemedText style={styles.ratingText}>
+                    {book.rating}
+                  </ThemedText>
                 </View>
                 <ThemedText
                   style={styles.title}
@@ -139,13 +175,19 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
                   {book.author}
                 </ThemedText>
               </View>
-              <Pressable
-                //   onPressIn={() => handleReadToggle(book)}
-                style={styles.readStatus}
-                //   onPress={() => handleReadToggle(book)}
-              >
-                <MaterialCommunityIcons name="delete" size={24} color="red" />
-                <MaterialIcons name="mode-edit" size={24} color={Colors[theme].text} />
+              <Pressable style={styles.readStatus}>
+                <MaterialCommunityIcons
+                  name="delete"
+                  size={24}
+                  color="red"
+                  onPress={() => handleDelete(book.id)}
+                />
+                <MaterialIcons
+                  name="mode-edit"
+                  size={24}
+                  color={Colors[theme].text}
+                  onPress={() => handleEdit(book)}
+                />
               </Pressable>
             </View>
           ))}
