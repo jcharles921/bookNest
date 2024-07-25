@@ -26,15 +26,11 @@ interface Props {
 const FlatListCard: React.FC<Props> = ({ books }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
+  
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
-  const [loadingCards, setLoadingCards] = useState<{ [key: number]: boolean }>(
-    {}
-  );
 
-  const [loading2, setLoading2] = useState(false);
-  const isDark = theme === "dark";
   const { loading }: { loading: any } = useSelector(
     (state: RootState) => state.FetchBookSlice
   );
@@ -141,7 +137,7 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
   return (
     <ScrollView
       refreshControl={
-        <RefreshControl refreshing={loading2} onRefresh={refresh} />
+        <RefreshControl refreshing={loading} onRefresh={refresh} />
       }
     >
       {!loading &&
