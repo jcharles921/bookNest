@@ -13,9 +13,11 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
 import Colors from "@/utils/Colors";
+import { FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import api from "@/store/apis";
 import FlatListCard from "@/components/FlatListCard";
+import sortBooks from "@/utils/sortingBooks";
 
 export default function AddBook() {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,12 +35,24 @@ export default function AddBook() {
   const { success: updated, loading: loading2 } = useSelector(
     (state: RootState) => state.updateBook
   );
+  const { data: sortPreference } = useSelector(
+    (state: RootState) => state.fetchPreference
+  );
+  const [preference, setPreference] = useState("To Be Defined");
+  useEffect(() => {
+    dispatch(api.fetchPreferences());
+    if (sortPreference && sortPreference.sortingOrder) {
+      setPreference(sortPreference.sortingOrder);
+    }
+  }, []);
+
   useEffect(() => {
     dispatch(api.resetAll());
     dispatch(api.fetchBooks());
   }, [dispatch, success, updated]);
   const refresh = () => {
     dispatch(api.resetAll());
+    dispatch(api.fetchPreferences());
     dispatch(api.fetchBooks());
   };
   const styles = StyleSheet.create({
@@ -71,6 +85,10 @@ export default function AddBook() {
       marginRight: 8,
       fontWeight: 400,
     },
+    orderBox: {
+      flexDirection: "row",
+      gap: 4,
+    },
   });
   const handleAddButton = () => {
     router.navigate("AddBook");
@@ -90,13 +108,17 @@ export default function AddBook() {
           color={isDark ? "white" : "black"}
         />
       </Pressable>
+      <View style={styles.orderBox}>
+        <ThemedText>Sorted by: </ThemedText>
+        <ThemedText>{preference}</ThemedText>
+      </View>
       <ScrollView
         style={styles.flatList}
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={refresh} />
         }
       >
-        <FlatListCard books={books} />
+        <FlatListCard books={sortBooks(books, preference)} />
       </ScrollView>
     </View>
   );

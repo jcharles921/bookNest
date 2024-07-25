@@ -36,8 +36,8 @@ interface DeleteBookState {
   message: string;
 }
 interface Preference {
-  id: number;
-  sortingOrder: string;
+  id?: string | number;
+  sortingOrder?: string;
   preferredTheme: string;
 }
 
@@ -53,7 +53,7 @@ interface FetchPreferencesState {
   error: boolean | string;
   success: boolean;
   message: string;
-  data: Preference[];
+  data: Preference;
 }
 
 interface UpdatePreferenceState {
