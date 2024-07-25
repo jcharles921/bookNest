@@ -17,7 +17,6 @@ const updateBookSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(api.updateBook.fulfilled, (state, action: PayloadAction<any>) => {
-      
       state.loading = false;
       state.success = true;
       console.log("Book updated successfully");
@@ -34,7 +33,6 @@ const updateBookSlice = createSlice({
       state.error = false;
       state.message = '';
       state.success = false;
-
 
     });
   },

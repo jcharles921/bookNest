@@ -24,8 +24,7 @@ const Header: React.FC<Props> = ({ children }) => {
     container: {
       width: "100%",
       marginTop: 25, 
-      height: 100,
-      position:"static",
+      height: 120,
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
@@ -52,7 +51,7 @@ const Header: React.FC<Props> = ({ children }) => {
   return (
     <View style={styles.container}>
       {children}
-      <Pressable  onPress={toggleTheme} style={styles.toggle}>
+      <Pressable onPress={toggleTheme} style={styles.toggle}>
         {theme === "light" ? (
           <MaterialIcons
             name="dark-mode"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,7 +6,6 @@ import {
   Text,
   ScrollView,
   Pressable,
-  RefreshControl,
 } from "react-native";
 import { ThemedText } from "./ThemedText";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
@@ -16,6 +15,15 @@ import { RootState, AppDispatch } from "@/store";
 import { ActivityIndicator } from "react-native-paper";
 import api from "@/store/apis";
 
+interface Book {
+  id?: number;
+  name: string;
+  author: string;
+  image: string;
+  read: boolean;
+  createdAt: string;
+  rating: number;
+}
 
 interface Props {
   books: Book[];
@@ -26,11 +34,10 @@ const Card: React.FC<Props> = ({ books }) => {
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
-  const [loadingCards, setLoadingCards] = useState<{ [key: number]: boolean }>(
-    {}
-  );
 
-  const [loading2, setLoading2] = useState(false);
+  const { success, error } = useSelector(
+    (state: RootState) => state.updateBook
+  );
   const isDark = theme === "dark";
   const { loading } = useSelector((state: RootState) => state.FetchBookSlice);
 
@@ -96,24 +103,13 @@ const Card: React.FC<Props> = ({ books }) => {
       fontWeight: "bold",
       fontSize: 12,
     },
-    loader: {
-      width: 50,
-      height: 50,
-      zIndex: 20,
-      justifyContent: "center",
-      alignItems: "center",
-    },
   });
 
   const handleReadToggle = async (book: Book) => {
-    if (book.id === undefined) return;
-
-    setLoadingCards((prev) => ({ ...prev, [book.id!]: true }));
-    setLoading2(true);
     const updatedBook: Partial<Book> = { read: !book.read };
-    await dispatch(api.updateBook({ id: book.id, book: updatedBook }));
-
-    setLoadingCards((prev) => ({ ...prev, [book.id!]: false }));
+    if (book.id !== undefined) {
+      dispatch(api.updateBook({ id: book.id, book: updatedBook }));
+    }
   };
 
   const truncateText = (text: string, maxWords: number) => {
@@ -125,20 +121,11 @@ const Card: React.FC<Props> = ({ books }) => {
   };
 
   return (
-    <ScrollView
-      horizontal={true}
-      style={styles.cardWrapper}
-      refreshControl={<RefreshControl refreshing={loading2} />}
-    >
+    <ScrollView horizontal={true} style={styles.cardWrapper}>
       {!loading &&
         books.map((book) => (
           <View key={book.id} style={styles.card}>
             <View style={styles.imageBox}>
-              {loadingCards[book.id!] && (
-                <View style={styles.loader}>
-                  <ActivityIndicator color={Colors[theme].text2} />
-                </View>
-              )}
               <View style={styles.rating}>
                 <FontAwesome name="star" size={12} color={"#FFD335"} />
                 <Text style={styles.ratingText}>{book.rating}</Text>
@@ -160,7 +147,7 @@ const Card: React.FC<Props> = ({ books }) => {
               {truncateText(book.author, 2)}
             </ThemedText>
             <Pressable
-              onPressIn={() => handleReadToggle(book)}
+            onPressIn={() => handleReadToggle(book)}
               style={styles.readStatus}
               onPress={() => handleReadToggle(book)}
             >
