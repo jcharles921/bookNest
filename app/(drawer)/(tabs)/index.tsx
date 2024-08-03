@@ -48,7 +48,7 @@ const HomeScreen = () => {
     container: {
       backgroundColor: Colors[theme].background,
       flex: 1,
-      marginTop: 20,
+  
       paddingLeft: 20,
       fontFamily: "Eina",
     },
