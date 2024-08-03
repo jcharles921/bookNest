@@ -44,14 +44,10 @@ export default function AddBook() {
     if (sortPreference && sortPreference.sortingOrder) {
       setPreference(sortPreference.sortingOrder);
     }
-  }, []);
+  }, [preference]);
 
-  useEffect(() => {
-    dispatch(api.resetAll());
-    dispatch(api.fetchBooks());
-  }, [dispatch, success, updated]);
   const refresh = () => {
-    dispatch(api.resetAll());
+    setPreference("To Be Defined");
     dispatch(api.fetchPreferences());
     dispatch(api.fetchBooks());
   };
@@ -60,8 +56,6 @@ export default function AddBook() {
       paddingLeft: 16,
       backgroundColor: Colors[theme].background,
       height: "100%",
-     
-
     },
     welcomeText: {
       fontSize: 28,
