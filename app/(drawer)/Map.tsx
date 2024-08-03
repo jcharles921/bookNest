@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  Marker,
+  Polyline,
+  PROVIDER_GOOGLE,
+  Circle,
+} from "react-native-maps";
 import {
   StyleSheet,
   Text,
@@ -17,9 +22,9 @@ const Map = () => {
 
   const geofences = [
     {
-      latitude: -1.94995,
-      longitude: 30.05885,
-      radius: 100,
+      latitude: -1.9555556869345836,
+      longitude: 30.104252198149002,
+      radius: 100, // Radius in meters
       notifyOnEnter: true,
       notifyOnExit: true,
     },
@@ -33,39 +38,39 @@ const Map = () => {
   });
 
   const [locationHistory, setLocationHistory] = useState<any[]>([]);
+  const [isInRegion, setIsInRegion] = useState(false);
 
-  const isInGeofence = geofences.some((geofence) => {
-    const distance = Haversine(geofence, {
-      longitude: location.longitude,
-      latitude: location.latitude,
-    });
-    return distance <= geofence.radius;
-  });
+  const BUFFER_DISTANCE = 5; // 5 meters buffer
 
-  const inRegion = () => {
-    const distance = Haversine(geofences[0], {
-      longitude: location.longitude,
-      latitude: location.latitude,
-    });
-    if (distance <= geofences[0].radius) {
+  const checkGeofence = () => {
+    const distance = Haversine(
+      { latitude: geofences[0].latitude, longitude: geofences[0].longitude },
+      { latitude: location.latitude, longitude: location.longitude },
+      { unit: "meter" }
+    );
+
+    const inGeofence = distance <= geofences[0].radius + BUFFER_DISTANCE;
+
+    console.log(`Distance to geofence: ${distance.toFixed(2)} meters`);
+
+    if (inGeofence) {
+      setIsInRegion(true);
+      console.log("You're in the region");
       Toast.show({
         type: "success",
-        text1: "You're in region",
+        text1: "You're in the region",
         autoHide: true,
       });
-    }
-    if (distance > geofences[0].radius) {
+    } else if (!inGeofence) {
+      console.log("You're out of the region");
+      setIsInRegion(false);
       Toast.show({
         type: "error",
-        text1: "You're out of region",
+        text1: "You're out of the region, exactly at " + distance.toFixed(2)+ " meters of the geofence",
         autoHide: true,
       });
     }
   };
-
-  setTimeout(() => {
-    inRegion();
-  }, 30000);
 
   useEffect(() => {
     (async () => {
@@ -101,10 +106,7 @@ const Map = () => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0922 * ASPECT_RATIO,
           });
-          setLocationHistory((prev) => [
-            ...prev,
-            { latitude, longitude },
-          ]);
+          setLocationHistory((prev) => [...prev, { latitude, longitude }]);
         }
       );
 
@@ -113,6 +115,10 @@ const Map = () => {
       };
     })();
   }, []);
+
+  // useEffect(() => {
+  //   checkGeofence();
+  // }, [location]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F4F4F4" }}>
@@ -137,9 +143,22 @@ const Map = () => {
         )}
         <Polyline
           coordinates={locationHistory}
-          strokeColor="#000" // Change this to your desired color
+          strokeColor="#000"
           strokeWidth={6}
         />
+        {geofences.map((geofence, index) => (
+          <Circle
+            key={index}
+            center={{
+              latitude: geofence.latitude,
+              longitude: geofence.longitude,
+            }}
+            radius={geofence.radius}
+            fillColor="rgba(0, 0, 255, 0.1)"
+            strokeColor="rgba(0, 0, 255, 0.5)"
+            strokeWidth={2}
+          />
+        ))}
       </MapView>
       <TouchableOpacity
         activeOpacity={0.8}
@@ -152,7 +171,7 @@ const Map = () => {
           alignItems: "center",
           alignSelf: "center",
         }}
-        onPress={() => inRegion()}
+        onPress={checkGeofence}
       >
         <Text style={{ color: "white" }}>GeoFence status</Text>
       </TouchableOpacity>
