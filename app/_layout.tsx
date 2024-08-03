@@ -18,6 +18,7 @@ import { View, Text } from "react-native";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations"; // Adjust the path if necessary
 import { seedBooks } from "@/db/seeders";
+import Toast from "react-native-toast-message";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -83,9 +84,11 @@ export default function RootLayout() {
       >
         <Provider store={store}>
           <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="(drawer)" options={{ headerShown: false }} /> */}
             <Stack.Screen name="+not-found" />
           </Stack>
+          <Toast  />
         </Provider>
       </PaperProvider>
     </ThemeProvider>

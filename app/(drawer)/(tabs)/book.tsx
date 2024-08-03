@@ -60,6 +60,8 @@ export default function AddBook() {
       paddingLeft: 16,
       backgroundColor: Colors[theme].background,
       height: "100%",
+     
+
     },
     welcomeText: {
       fontSize: 28,

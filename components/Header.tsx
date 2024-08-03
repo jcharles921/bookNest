@@ -23,8 +23,8 @@ const Header: React.FC<Props> = ({ children }) => {
   const styles = StyleSheet.create({
     container: {
       width: "100%",
-      marginTop: 25, 
-      height: 120,
+      height: 60,
+      marginBottom: 30,
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
