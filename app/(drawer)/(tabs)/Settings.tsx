@@ -13,19 +13,26 @@ import api from "@/store/apis";
 export default function Settings() {
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as "light" | "dark";
   const { data } = useSelector((state: RootState) => state.fetchPreference);
+  const { success } = useSelector((state: RootState) => state.updatePreference);
   const dispatch = useDispatch<AppDispatch>();
 
-  const [preference, setPreference] = useState<string>("To Be Defined");
+  const [sortingOrder, setSortingOrder] = useState<string>("Rating");
   const [loading, setLoading] = useState(false);
-  const [sortingOrder, setSortingOrder] = useState<string>("To Be Defined");
 
   useEffect(() => {
     dispatch(api.fetchPreferences());
     if (data && data.sortingOrder) {
-      setPreference(data.sortingOrder);
       setSortingOrder(data.sortingOrder);
     }
-  }, [data, dispatch]);
+  }, []);
+  useEffect(() => {
+    dispatch(api.fetchPreferences());
+setTimeout(() => {
+  if (data && data.sortingOrder) {
+    setSortingOrder(data.sortingOrder);
+  }
+}, 2000);
+  }, [success]);
 
   const styles = StyleSheet.create({
     titleContainer: {
@@ -79,13 +86,12 @@ export default function Settings() {
 
   const handleSortingChange = (newOrder: string) => {
     setSortingOrder(newOrder);
-    setPreference(newOrder);
-    const sortingOrder = {
+    const preference = {
       id: 1,
       sortingOrder: newOrder,
-      preferredTheme: "dark",
+      preferredTheme: theme,
     };
-    dispatch(api.updatePreference({ preference: sortingOrder }));
+    dispatch(api.updatePreference({ preference }));
   };
 
   return (
@@ -99,33 +105,17 @@ export default function Settings() {
       </View>
 
       <View style={styles.radioGroup}>
-        <View style={styles.radioItem}>
-          <RadioButton
-            value="Date"
-            color={Colors[theme].text}
-            status={sortingOrder === "Date" ? "checked" : "unchecked"}
-            onPress={() => handleSortingChange("Date")}
-          />
-          <ThemedText>Date</ThemedText>
-        </View>
-        <View style={styles.radioItem}>
-          <RadioButton
-            value="Rating"
-            color={Colors[theme].text}
-            status={sortingOrder === "Rating" ? "checked" : "unchecked"}
-            onPress={() => handleSortingChange("Rating")}
-          />
-          <ThemedText>Rating</ThemedText>
-        </View>
-        <View style={styles.radioItem}>
-          <RadioButton
-            value="Alphabet"
-            color={Colors[theme].text}
-            status={sortingOrder === "Alphabet" ? "checked" : "unchecked"}
-            onPress={() => handleSortingChange("Alphabet")}
-          />
-          <ThemedText>Alphabet</ThemedText>
-        </View>
+        {["Date", "Rating", "Alphabet"].map((option) => (
+          <View key={option} style={styles.radioItem}>
+            <RadioButton
+              value={option}
+              color={Colors[theme].text}
+              status={sortingOrder === option ? "checked" : "unchecked"}
+              onPress={() => handleSortingChange(option)}
+            />
+            <ThemedText>{option}</ThemedText>
+          </View>
+        ))}
       </View>
 
       <Button

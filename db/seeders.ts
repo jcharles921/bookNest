@@ -78,7 +78,7 @@ async function seedBooks() {
   const bookEntries = Array.from({ length: 20 }, () => ({
     name: generateBookTitle(),
     author: faker.person.fullName(),
-    image: faker.image.url({ width: 116, height: 154 }),
+    image: faker.image.urlLoremFlickr({ width: 116, height: 154, category: 'book' }),
     read: faker.datatype.boolean(),
     createdAt: sql`datetime('now')`, // Use SQL function for current timestamp
     rating: faker.number.float({ min: 0, max: 5, multipleOf: 0.1 }),
