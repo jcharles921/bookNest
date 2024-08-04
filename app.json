@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mid",
+    "name": "Book Nest",
     "slug": "mid",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": ["android.permission.RECORD_AUDIO"],
-      "package": "com.bouboune.mid"
+      "package": "com.bouboune.booknest"
     },
     "web": {
       "bundler": "metro",
