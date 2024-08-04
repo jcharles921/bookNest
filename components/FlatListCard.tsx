@@ -26,7 +26,7 @@ interface Props {
 const FlatListCard: React.FC<Props> = ({ books }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
-  
+
   const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
     | "light"
     | "dark";
@@ -59,7 +59,7 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
       width: 60,
       height: 80,
       borderRadius: 8.44,
-      fontFamily: "Eina",
+      fontFamily: "GupterRegular",
     },
     bookItem: {
       marginBottom: 10,

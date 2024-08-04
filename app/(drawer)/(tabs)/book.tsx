@@ -59,7 +59,7 @@ export default function AddBook() {
     },
     welcomeText: {
       fontSize: 28,
-      fontFamily: "Eina",
+      fontFamily: "GupterRegular",
       color: Colors[theme].text,
     },
     flatList: {
@@ -77,7 +77,7 @@ export default function AddBook() {
     addText: {
       color: Colors[theme].text,
       fontSize: 16,
-      fontFamily: "Inter",
+      fontFamily: "GupterBold",
       marginRight: 8,
       fontWeight: 400,
     },

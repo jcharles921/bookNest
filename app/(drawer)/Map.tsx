@@ -24,18 +24,19 @@ const Map = () => {
     {
       latitude: -1.9555556869345836,
       longitude: 30.104252198149002,
-      radius: 50, 
+      radius: 80,
       notifyOnEnter: true,
       notifyOnExit: true,
+      label: "AUCA fences",
     },
-      // test home 
-      // {
-      //   latitude: -1.9396815039098625,
-      //   longitude:  30.119462949011755,
-      //   radius: 50, 
-      //   notifyOnEnter: true,
-      //   notifyOnExit: true,
-      // },
+    {
+      latitude: -1.9396815039098625,
+      longitude: 30.119462949011755,
+      radius: 50,
+      notifyOnEnter: true,
+      notifyOnExit: true,
+      label: "Home fences",
+    },
   ];
 
   const [location, setLocation] = useState({
@@ -50,48 +51,54 @@ const Map = () => {
   const BUFFER_DISTANCE = 5;
 
   const checkGeofence = () => {
-    const distance = Haversine(
-      { latitude: geofences[0].latitude, longitude: geofences[0].longitude },
-      { latitude: location.latitude, longitude: location.longitude },
-      { unit: "meter" }
-    );
+    try {
+      const distance = Haversine(
+        { latitude: geofences[0].latitude, longitude: geofences[0].longitude },
+        { latitude: location.latitude, longitude: location.longitude },
+        { unit: "meter" }
+      );
 
-    const inGeofence = distance <= geofences[0].radius + BUFFER_DISTANCE;
+      const inGeofence = distance <= geofences[0].radius + BUFFER_DISTANCE;
 
-    console.log(`Distance to geofence: ${distance.toFixed(2)} meters`);
+      console.log(`Distance to geofence: ${distance.toFixed(2)} meters`);
 
-    if (inGeofence) {
-      console.log("You're in the region");
-      Toast.show({
-        type: "success",
-        text1: "You're in the region",
-        autoHide: true,
-      });
-    } else {
-      console.log("You're out of the region");
-
-      Toast.show({
-        type: "error",
-        text1: `You're out of the region, exactly at ${distance.toFixed(
-          2
-        )} meters of the geofence`,
-        autoHide: true,
-      });
+      if (inGeofence) {
+        console.log("You're in the region");
+        Toast.show({
+          type: "success",
+          text1: "You're in the region",
+          autoHide: true,
+        });
+      } else {
+        console.log("You're out of the region");
+        Toast.show({
+          type: "error",
+          text1: `You're out of the region, exactly at ${distance.toFixed(
+            2
+          )} meters of the geofence`,
+          autoHide: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error checking geofence: ", error);
     }
   };
 
   useEffect(() => {
     (async () => {
       try {
+        console.log("Requesting location permissions...");
         let { status } = await Location.requestForegroundPermissionsAsync();
         const { status: backgroundStatus } =
           await Location.requestBackgroundPermissionsAsync();
         if (status !== "granted" || backgroundStatus !== "granted") {
+          console.log("Permissions not granted");
           await Location.requestForegroundPermissionsAsync();
           await Location.requestBackgroundPermissionsAsync();
           return;
         }
 
+        console.log("Getting current location...");
         let location = await Location.getCurrentPositionAsync({});
         setLocation({
           longitude: location.coords.longitude,
@@ -100,14 +107,15 @@ const Map = () => {
           longitudeDelta: 0.0922 * ASPECT_RATIO,
         });
 
-        // Track location updates
+        console.log("Subscribing to location updates...");
         const locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.Highest,
-            timeInterval: 10000, // Update every 10 seconds
-            distanceInterval: 10, // Update every 10 meters
+            timeInterval: 10000,
+            distanceInterval: 10,
           },
           (newLocation) => {
+            console.log("Location updated: ", newLocation);
             const { latitude, longitude } = newLocation.coords;
             setLocation({
               latitude,
@@ -120,17 +128,14 @@ const Map = () => {
         );
 
         return () => {
+          console.log("Removing location subscription...");
           locationSubscription.remove();
         };
       } catch (error) {
-        console.error(error);
+        console.error("Error during location updates: ", error);
       }
     })();
   }, []);
-
-  // useEffect(() => {
-  //   checkGeofence();
-  // }, [location]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#F4F4F4" }}>
@@ -146,30 +151,32 @@ const Map = () => {
         }}
         showsUserLocation
       >
-        {location && (
-          <Marker
-            coordinate={location}
-            title="My location"
-            description="This is where you're currently located"
-          />
-        )}
         <Polyline
           coordinates={locationHistory}
           strokeColor="#000"
           strokeWidth={6}
         />
         {geofences.map((geofence, index) => (
-          <Circle
-            key={index}
-            center={{
-              latitude: geofence.latitude,
-              longitude: geofence.longitude,
-            }}
-            radius={geofence.radius}
-            fillColor="rgba(0, 0, 255, 0.1)"
-            strokeColor="rgba(0, 0, 255, 0.5)"
-            strokeWidth={2}
-          />
+          <View key={index}>
+            <Circle
+              center={{
+                latitude: geofence.latitude,
+                longitude: geofence.longitude,
+              }}
+              radius={geofence.radius}
+              fillColor="rgba(255, 0, 0, 0.1)"
+              strokeColor="rgba(0, 0, 255, 0.5)"
+              strokeWidth={2}
+            />
+            <Marker
+              coordinate={{
+                longitude: geofence.longitude,
+                latitude: geofence.latitude,
+              }}
+              title={geofence.label}
+              description="This is one of the fences"
+            />
+          </View>
         ))}
       </MapView>
       <TouchableOpacity

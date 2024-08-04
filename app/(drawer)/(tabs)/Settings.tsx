@@ -11,7 +11,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import api from "@/store/apis";
 
 export default function Settings() {
-  const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as "light" | "dark";
+  const theme = useSelector((state: RootState) => state.ThemeMode.themeMode) as
+    | "light"
+    | "dark";
   const { data } = useSelector((state: RootState) => state.fetchPreference);
   const { success } = useSelector((state: RootState) => state.updatePreference);
   const dispatch = useDispatch<AppDispatch>();
@@ -27,11 +29,11 @@ export default function Settings() {
   }, []);
   useEffect(() => {
     dispatch(api.fetchPreferences());
-setTimeout(() => {
-  if (data && data.sortingOrder) {
-    setSortingOrder(data.sortingOrder);
-  }
-}, 2000);
+    setTimeout(() => {
+      if (data && data.sortingOrder) {
+        setSortingOrder(data.sortingOrder);
+      }
+    }, 2000);
   }, [success]);
 
   const styles = StyleSheet.create({
@@ -45,12 +47,12 @@ setTimeout(() => {
     },
     welcomeText: {
       fontSize: 28,
-      fontFamily: "Eina",
+      fontFamily: "GupterRegular",
       color: Colors[theme].text,
     },
     sortingText: {
       fontSize: 16,
-      fontFamily: "Inter",
+      fontFamily: "GupterBold",
       color: Colors[theme].text,
       fontWeight: "800",
       textTransform: "uppercase",

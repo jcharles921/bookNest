@@ -48,6 +48,9 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     Inter: require("../assets/fonts/Inter-VariableFont_slnt,wght.ttf"),
     Eina: require("../assets/fonts/eina-01-regular.ttf"),
+    GupterBold: require("../assets/fonts/Gupter-Bold.ttf"),
+    GupterMedium: require("../assets/fonts/Gupter-Medium.ttf"),
+    GupterRegular: require("../assets/fonts/Gupter-Regular.ttf"),
   });
 
   const { success, error } = useMigrations(db, migrations);
@@ -88,7 +91,7 @@ export default function RootLayout() {
             {/* <Stack.Screen name="(drawer)" options={{ headerShown: false }} /> */}
             <Stack.Screen name="+not-found" />
           </Stack>
-          <Toast  />
+          <Toast />
         </Provider>
       </PaperProvider>
     </ThemeProvider>

@@ -53,7 +53,7 @@ export default function AddBook() {
       backgroundColor: Colors[theme].background,
       borderColor: Colors[theme].border,
       color: Colors[theme].text,
-      fontFamily: "Inter",
+      fontFamily: "GupterBold",
     },
     image: {
       width: 100,

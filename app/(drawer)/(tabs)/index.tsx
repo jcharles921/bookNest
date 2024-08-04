@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, View, ScrollView, Text, RefreshControl } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  RefreshControl,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/store";
 import { Searchbar, ActivityIndicator } from "react-native-paper";
@@ -48,9 +54,9 @@ const HomeScreen = () => {
     container: {
       backgroundColor: Colors[theme].background,
       flex: 1,
-  
+
       paddingLeft: 20,
-      fontFamily: "Eina",
+      fontFamily: "GupterRegular",
     },
     button: {
       marginTop: 20,
@@ -131,9 +137,9 @@ const HomeScreen = () => {
     >
       <Header>
         <View>
-          <ThemedText style={styles.welcomeText}>Hi Fela!</ThemedText>
+          <ThemedText style={styles.welcomeText}>Hello !!!</ThemedText>
           <ThemedText style={styles.welcomeText2}>
-            What are you reading today?
+            Nice to see you again 
           </ThemedText>
         </View>
       </Header>

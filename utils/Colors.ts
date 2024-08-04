@@ -11,7 +11,7 @@ export interface ColorsType {
     secondaryText: string;
     authBackground: string;
     active: string;
-    buttonText:string;
+    buttonText: string;
     placeholder: string;
   };
   dark: {
@@ -26,43 +26,42 @@ export interface ColorsType {
     secondaryText: string;
     authBackground: string;
     active: string;
-    buttonText:string;
+    buttonText: string;
     placeholder: string;
   };
 }
 
 const Colors: ColorsType = {
   light: {
-    primary: "#FFFFFF",
-    text: "#000000",
-    text2: "#FFFFFF",
-    icon: "#000000",
-    button: "#ADD8E6",
-    background: "#F5F5F5",
-    background2: "#1E1E1E",
-    border: "#000000",
-    secondaryText: "#828282",
-    active: "#000000",
-    authBackground: "#E4F1F8",
-    buttonText:"#000000",
-    placeholder: "#828282",
-
+    primary: "#FAF3F3",  // Soft pinkish-white
+    text: "#4A4A4A",  // Dark slate gray
+    text2: "#7D7D7D",  // Medium gray for secondary text
+    icon: "#5F5F5F",  // Gray for icons
+    button: "#FF6F61",  // Coral for buttons
+    background: "#FBE8E8",  // Light pink for background
+    background2: "#F7F7F7",  // Very light gray for secondary background
+    border: "#E0E0E0",  // Light gray for borders
+    secondaryText: "#9B9B9B",  // Light gray for secondary text
+    authBackground: "#FBE8E8",  // Light pink for auth background
+    active: "#FF7043",  // Vivid coral for active elements
+    buttonText: "#FFFFFF",  // White text for buttons
+    placeholder: "#C1C1C1"  // Light gray for placeholders
   },
   dark: {
-    primary: "#000000",
-    icon: "#ffffff",
-    text: "#FFFFFF",
-    text2: "#000000",
-    button: "#ADD8E6",
-    background: "#1E1E1E",
-    background2: "#F5F5F5",
-    border: "#FFFFFF",
-    secondaryText: "#B0B0B0",
-    authBackground: "#1E1E1E",
-    active: "#ADD8E6",
-    buttonText:"#ffffff",
-    placeholder: "#B0B0B0",
-  },
+    primary: "#2E2E2E",  // Charcoal gray for primary
+    text: "#E5E5E5",  // Light gray for text
+    text2: "#B0B0B0",  // Medium light gray for secondary text
+    icon: "#C0C0C0",  // Light silver for icons
+    button: "#FF6F61",  // Coral for buttons
+    background: "#2C2C2C",  // Darker pinkish-gray for background
+    background2: "#1A1A1A",  // Dark gray for secondary background
+    border: "#3C3C3C",  // Dark gray for borders
+    secondaryText: "#8A8A8A",  // Medium gray for secondary text
+    authBackground: "#2C2C2C",  // Matching dark pinkish-gray for auth background
+    active: "#FF7043",  // Vivid coral for active elements
+    buttonText: "#2E2E2E",  // Dark gray text for buttons
+    placeholder: "#7F7F7F"  // Medium gray for placeholders
+  }
 };
 
 export default Colors;
