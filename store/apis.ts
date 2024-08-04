@@ -178,7 +178,6 @@ class Api {
     async (_, { rejectWithValue }) => {
       try {
         const preferences = await getPreferences();
-        console.log(preferences + " Consoling preferences");
         return preferences;
       } catch (error: any) {
         return rejectWithValue("Error fetching preferences");

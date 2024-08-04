@@ -142,8 +142,8 @@ const FlatListCard: React.FC<Props> = ({ books }) => {
     >
       {!loading &&
         books
-          .slice()
-          .reverse()
+          // .slice()
+          // .reverse()
           .map((book) => (
             <View key={book.id} style={styles.card}>
               <View style={styles.imageBox}>

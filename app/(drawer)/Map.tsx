@@ -24,10 +24,18 @@ const Map = () => {
     {
       latitude: -1.9555556869345836,
       longitude: 30.104252198149002,
-      radius: 100, // Radius in meters
+      radius: 50, 
       notifyOnEnter: true,
       notifyOnExit: true,
     },
+      // test home 
+      // {
+      //   latitude: -1.9396815039098625,
+      //   longitude:  30.119462949011755,
+      //   radius: 50, 
+      //   notifyOnEnter: true,
+      //   notifyOnExit: true,
+      // },
   ];
 
   const [location, setLocation] = useState({
@@ -38,9 +46,8 @@ const Map = () => {
   });
 
   const [locationHistory, setLocationHistory] = useState<any[]>([]);
-  const [isInRegion, setIsInRegion] = useState(false);
 
-  const BUFFER_DISTANCE = 5; // 5 meters buffer
+  const BUFFER_DISTANCE = 5;
 
   const checkGeofence = () => {
     const distance = Haversine(
@@ -54,19 +61,20 @@ const Map = () => {
     console.log(`Distance to geofence: ${distance.toFixed(2)} meters`);
 
     if (inGeofence) {
-      setIsInRegion(true);
       console.log("You're in the region");
       Toast.show({
         type: "success",
         text1: "You're in the region",
         autoHide: true,
       });
-    } else if (!inGeofence) {
+    } else {
       console.log("You're out of the region");
-      setIsInRegion(false);
+
       Toast.show({
         type: "error",
-        text1: "You're out of the region, exactly at " + distance.toFixed(2)+ " meters of the geofence",
+        text1: `You're out of the region, exactly at ${distance.toFixed(
+          2
+        )} meters of the geofence`,
         autoHide: true,
       });
     }
@@ -74,45 +82,49 @@ const Map = () => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      const { status: backgroundStatus } =
-        await Location.requestBackgroundPermissionsAsync();
-      if (status !== "granted" || backgroundStatus !== "granted") {
-        await Location.requestForegroundPermissionsAsync();
-        await Location.requestBackgroundPermissionsAsync();
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation({
-        longitude: location.coords.longitude,
-        latitude: location.coords.latitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0922 * ASPECT_RATIO,
-      });
-
-      // Track location updates
-      const locationSubscription = await Location.watchPositionAsync(
-        {
-          accuracy: Location.Accuracy.Highest,
-          timeInterval: 10000, // Update every 10 seconds
-          distanceInterval: 10, // Update every 10 meters
-        },
-        (newLocation) => {
-          const { latitude, longitude } = newLocation.coords;
-          setLocation({
-            latitude,
-            longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0922 * ASPECT_RATIO,
-          });
-          setLocationHistory((prev) => [...prev, { latitude, longitude }]);
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        const { status: backgroundStatus } =
+          await Location.requestBackgroundPermissionsAsync();
+        if (status !== "granted" || backgroundStatus !== "granted") {
+          await Location.requestForegroundPermissionsAsync();
+          await Location.requestBackgroundPermissionsAsync();
+          return;
         }
-      );
 
-      return () => {
-        locationSubscription.remove();
-      };
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation({
+          longitude: location.coords.longitude,
+          latitude: location.coords.latitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0922 * ASPECT_RATIO,
+        });
+
+        // Track location updates
+        const locationSubscription = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.Highest,
+            timeInterval: 10000, // Update every 10 seconds
+            distanceInterval: 10, // Update every 10 meters
+          },
+          (newLocation) => {
+            const { latitude, longitude } = newLocation.coords;
+            setLocation({
+              latitude,
+              longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0922 * ASPECT_RATIO,
+            });
+            setLocationHistory((prev) => [...prev, { latitude, longitude }]);
+          }
+        );
+
+        return () => {
+          locationSubscription.remove();
+        };
+      } catch (error) {
+        console.error(error);
+      }
     })();
   }, []);
 
@@ -127,8 +139,8 @@ const Map = () => {
         provider={PROVIDER_GOOGLE}
         showsMyLocationButton
         initialRegion={{
-          longitude: 30.05885,
-          latitude: -1.94995,
+          longitude: 30.104252198149002,
+          latitude: -1.9555556869345836,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0922 * ASPECT_RATIO,
         }}

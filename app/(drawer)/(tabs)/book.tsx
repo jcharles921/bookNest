@@ -31,25 +31,25 @@ export default function AddBook() {
     loading,
     error,
   } = useSelector((state: RootState) => state.FetchBookSlice);
-  const { success } = useSelector((state: RootState) => state.CreateBookSlice);
-  const { success: updated, loading: loading2 } = useSelector(
-    (state: RootState) => state.updateBook
-  );
+
   const { data: sortPreference } = useSelector(
     (state: RootState) => state.fetchPreference
   );
-  const [preference, setPreference] = useState("To Be Defined");
+  const [preference, setPreference] = useState("Rating");
   useEffect(() => {
     dispatch(api.fetchPreferences());
+    console.log(sortPreference);
     if (sortPreference && sortPreference.sortingOrder) {
       setPreference(sortPreference.sortingOrder);
     }
   }, [preference]);
 
   const refresh = () => {
-    setPreference("To Be Defined");
     dispatch(api.fetchPreferences());
     dispatch(api.fetchBooks());
+    if (sortPreference && sortPreference.sortingOrder) {
+      setPreference(sortPreference.sortingOrder);
+    }
   };
   const styles = StyleSheet.create({
     container: {
